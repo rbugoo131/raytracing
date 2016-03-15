@@ -8,12 +8,22 @@
 static inline
 void normalize(double *v)
 {
-    double d = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    assert(d != 0.0 && "Error calculating normal");
+    double d = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+    long long int i;
+    double x2;
+    const double threehalfs = 1.5F;
 
-    v[0] /= d;
-    v[1] /= d;
-    v[2] /= d;
+    x2 = d * 0.5F;
+    i = * (long long int *)&d;
+    i = 0x5fe6ec85e7de30da - (i >> 1);
+    d = * (double *)&i;
+    d *= (threehalfs - (x2 * d * d));
+    d *= (threehalfs - (x2 * d * d));
+    d *= (threehalfs - (x2 * d * d));
+
+    v[0] *= d;
+    v[1] *= d;
+    v[2] *= d;
 }
 
 static inline
@@ -25,15 +35,17 @@ double length(const double *v)
 static inline
 void add_vector(const double *a, const double *b, double *out)
 {
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] + b[i];
+    out[0] = a[0] + b[0];
+    out[1] = a[1] + b[1];
+    out[2] = a[2] + b[2];
 }
 
 static inline
 void subtract_vector(const double *a, const double *b, double *out)
 {
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] - b[i];
+    out[0] = a[0] - b[0];
+    out[1] = a[1] - b[1];
+    out[2] = a[2] - b[2];
 }
 
 static inline
@@ -61,10 +73,7 @@ void cross_product(const double *v1, const double *v2, double *out)
 static inline
 double dot_product(const double *v1, const double *v2)
 {
-    double dp = 0.0;
-    for (int i = 0; i < 3; i++)
-        dp += v1[i] * v2[i];
-    return dp;
+    return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 }
 
 static inline
